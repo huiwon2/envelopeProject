@@ -30,7 +30,7 @@ public class SecretKey {
 
         Cipher c1;
         try {
-            c1 = Cipher.getInstance("AES");
+            c1 = Cipher.getInstance("DES");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         } catch (NoSuchPaddingException e) {
