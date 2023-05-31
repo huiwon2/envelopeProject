@@ -32,7 +32,7 @@ public class MakeEnvelope {
 //        secretKey 객체 생성
         try {
             keyGenerator = KeyGenerator.getInstance("DES");
-            keyGenerator.init(128);
+            keyGenerator.init(56);
 
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
