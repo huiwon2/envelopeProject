@@ -1,11 +1,10 @@
 package Envelope;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.security.*;
 import java.util.Scanner;
 
@@ -17,6 +16,7 @@ public class VerifyEnvelope {
 //        원래 데이터 문장을 입력받음
         String data;
         String publicName;
+        String envelopeName;
 
         KeyPairGenerator keyPairGen;
         KeyGenerator keyGenerator;
@@ -31,7 +31,7 @@ public class VerifyEnvelope {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
 
-        //        secretKey 객체 생성
+//        secretKey 객체 생성
         try {
             keyGenerator = KeyGenerator.getInstance("DES");
             keyGenerator.init(56);
@@ -60,17 +60,7 @@ public class VerifyEnvelope {
 //        bufferData => data의 byte타입으로 변환
         byte[] bufferData = data.getBytes();
 
-//        공개키 읽어들이기
-        try(FileInputStream fileInputStream = new FileInputStream(publicName)){
-            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-                byte[] buffer = (byte[]) objectInputStream.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        //        signature 생성하기
+//        signature 생성하기
         Signature signature;
         byte[] sign;
         try {
@@ -85,12 +75,37 @@ public class VerifyEnvelope {
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
-//      서명 정보 출력하기
-        System.out.println("입력된 서명 정보: " + sign.length);
-        for (byte b : sign) {
-            System.out.print(String.format("%02x", b) + "\t");
+
+//        공개키 읽어들이기
+        try(FileInputStream fileInputStream = new FileInputStream(publicName)){
+            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+                byte[] buffer = (byte[]) objectInputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        System.out.println();
+
+        System.out.print("전자봉투 파일 입력 : ");
+        envelopeName = scanner.next();
+
+//      서명 정보 출력하기(복호화 후 출력)
+        try(FileInputStream bis = new FileInputStream(envelopeName);
+            CipherInputStream cipherInputStream = new CipherInputStream(bis, cipher);
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(cipherInputStream))){
+            StringBuffer decrypted = new StringBuffer();
+            String line = bufferedReader.readLine();
+            while (line != null){
+                decrypted.append(line);
+                line = bufferedReader.readLine();
+            }
+            System.out.println(decrypted);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+
 //        서명 검증하기
 
     }
