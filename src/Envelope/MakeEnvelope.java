@@ -1,10 +1,10 @@
 package Envelope;
 
 import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import javax.crypto.NoSuchPaddingException;
+import java.io.*;
 import java.security.*;
 import java.util.Scanner;
 
@@ -29,6 +29,7 @@ public class MakeEnvelope {
         PublicKey publicKey = keyPair.getPublic();
         PrivateKey privateKey = keyPair.getPrivate();
 
+//        secretKey 객체 생성
         try {
             keyGenerator = KeyGenerator.getInstance("DES");
             keyGenerator.init(128);
@@ -37,7 +38,19 @@ public class MakeEnvelope {
             throw new RuntimeException(e);
         }
         Key secretKey = keyGenerator.generateKey();
+//        cipher 객체
         Cipher cipher;
+        try {
+            cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
+
 
         System.out.print("텍스트 입력(100byte 이하) : ");
         data = scanner.next();
@@ -81,6 +94,26 @@ public class MakeEnvelope {
         } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+//      서명 정보 출력하기
+        System.out.println("입력된 서명 정보: " + sign.length);
+        for (byte b : sign) {
+            System.out.print(String.format("%02x", b) + "\t");
+        }
+        String envelopeFile;
+//         저장할 파일 입력받기
+        System.out.print("저장할 파일 이름 : ");
+        envelopeFile = scanner.next();
+
+//        서명을 대칭키로 암호화하기
+        try(FileOutputStream bos = new FileOutputStream(envelopeFile);
+            CipherOutputStream cos = new CipherOutputStream(bos, cipher)){
+            cos.write(sign);
+            cos.flush();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
