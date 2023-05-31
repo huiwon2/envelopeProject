@@ -99,14 +99,16 @@ public class VerifyEnvelope {
 //      서명 정보 출력하기(복호화 후 출력)
 //      복호화
         try (FileInputStream fis = new FileInputStream(envelopeName);
-             CipherInputStream cis = new CipherInputStream(fis, cipher)) {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = cis.read(buffer)) != -1) {
-                bos.write(buffer, 0, bytesRead);
+             CipherInputStream cis = new CipherInputStream(fis, cipher);
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(cis))) {
+            StringBuffer decrypted = new StringBuffer();
+            String line = bufferedReader.readLine();
+            while (line != null){
+                decrypted.append(line);
+                line = bufferedReader.readLine();
             }
-            signatureBuffer = bos.toByteArray();
+            signatureBuffer = decrypted.toString().getBytes();
+            System.out.println(decrypted);
 
             // 검증을 위한 Signature 객체 생성
             try {
