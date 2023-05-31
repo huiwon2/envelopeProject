@@ -22,7 +22,7 @@ public class VerifyEnvelope {
         KeyGenerator keyGenerator;
         try {
             keyPairGen = KeyPairGenerator.getInstance("RSA");
-        }catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
         keyPairGen.initialize(1024);
@@ -62,7 +62,7 @@ public class VerifyEnvelope {
 
 //        signature 생성하기
         Signature signature;
-        Signature signature_verify;
+        Signature signature_verify;// 검증 signature 객체
         byte[] sign;
         try {
             signature = Signature.getInstance(signAlgorithm);
@@ -78,23 +78,17 @@ public class VerifyEnvelope {
         }
 
 //        공개키 읽어들이기
-        try(FileInputStream fileInputStream = new FileInputStream(publicName)) {
+        try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
                 byte[] buffer = (byte[]) objectInputStream.readObject();
-                // 서명 검증
-                signature_verify = Signature.getInstance(signAlgorithm);
-                signature_verify.initVerify(publicKey);
-                signature_verify.update(bufferData);
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (SignatureException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidKeyException e) {
-                throw new RuntimeException(e);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -103,28 +97,44 @@ public class VerifyEnvelope {
 
 
 //      서명 정보 출력하기(복호화 후 출력)
-        byte[] decrypted;
-        try(FileInputStream bis = new FileInputStream(envelopeName);
-            CipherInputStream cipherInputStream = new CipherInputStream(bis, cipher);
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(cipherInputStream))){
-            decrypted = (byte[]) cipherInputStream.readAllBytes();
-            for (byte b : decrypted) {
-                System.out.print(String.format("%02x", b) + "\t");
+//      복호화
+        try (FileInputStream fis = new FileInputStream(envelopeName);
+             CipherInputStream cis = new CipherInputStream(fis, cipher)) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = cis.read(buffer)) != -1) {
+                bos.write(buffer, 0, bytesRead);
             }
-            System.out.println();
-        } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
+            byte[] signatureBuffer = bos.toByteArray();
 
+            // 검증을 위한 Signature 객체 생성
+            try {
+                signature_verify = Signature.getInstance(signAlgorithm);
+                signature_verify.initVerify(publicKey);
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
+
+            // 서명 검증
+            try {
+                signature_verify.update(signatureBuffer);
+                boolean isVerified = signature_verify.verify(signatureBuffer);
+            } catch (SignatureException e) {
+                throw new RuntimeException(e);
+            }
 //        서명 검증하기
-        try {
-            boolean rslt = signature_verify.verify(decrypted);
-            System.out.println("서명 검증 결과: " + rslt);
-        } catch (SignatureException e) {
+            try {
+                boolean rslt = signature_verify.verify(signatureBuffer);
+                System.out.println("서명 검증 결과: " + rslt);
+            } catch (SignatureException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
 
+    }
 }
