@@ -53,7 +53,7 @@ public class MakeEnvelope {
 
 
         System.out.print("텍스트 입력(100byte 이하) : ");
-        data = scanner.next();
+        data = scanner.nextLine();
         System.out.print("개인키 파일 입력 : ");
         privateName = scanner.next();
 
