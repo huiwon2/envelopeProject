@@ -22,7 +22,7 @@ public class SecretKey {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        keyGenerator.init(128);
+        keyGenerator.init(56);
         Key secretKey = keyGenerator.generateKey();
 
         System.out.print("비밀키를 저장할 파일이름 : ");
