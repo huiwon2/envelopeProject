@@ -76,7 +76,7 @@ public class VerifyEnvelope {
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
-
+        byte[] signatureBuffer;
 //        공개키 읽어들이기
         try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
@@ -106,7 +106,7 @@ public class VerifyEnvelope {
             while ((bytesRead = cis.read(buffer)) != -1) {
                 bos.write(buffer, 0, bytesRead);
             }
-            byte[] signatureBuffer = bos.toByteArray();
+            signatureBuffer = bos.toByteArray();
 
             // 검증을 위한 Signature 객체 생성
             try {
