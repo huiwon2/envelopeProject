@@ -58,18 +58,18 @@ public class MakeEnvelope {
         privateName = scanner.next();
 
 //        bufferData => data의 byte타입으로 변환
-        byte[] bufferData;
+        byte[] bufferData = data.getBytes();
 //        data 읽어들이기(data를 문장으로 받아서)
-        try(FileInputStream fileInputStream = new FileInputStream(data)){
-            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-                bufferData = (byte[]) objectInputStream.readObject();
-                System.out.println();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try(FileInputStream fileInputStream = new FileInputStream(data)){
+//            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+//                bufferData = (byte[]) objectInputStream.readObject();
+//                System.out.println();
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException(e);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 //        개인키 읽어들이기
         try(FileInputStream fileInputStream = new FileInputStream(privateName)){
             try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
@@ -101,6 +101,7 @@ public class MakeEnvelope {
         for (byte b : sign) {
             System.out.print(String.format("%02x", b) + "\t");
         }
+        System.out.println();
         String envelopeFile;
 //         저장할 파일 입력받기
         System.out.print("저장할 파일 이름 : ");
