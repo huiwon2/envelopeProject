@@ -22,7 +22,7 @@ public class VerifyEnvelope {
         KeyGenerator keyGenerator;
         try {
             keyPairGen = KeyPairGenerator.getInstance("RSA");
-        }catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
         keyPairGen.initialize(1024);
@@ -78,17 +78,17 @@ public class VerifyEnvelope {
         }
 
 //        공개키 읽어들이기
-        try(FileInputStream fileInputStream = new FileInputStream(publicName)) {
+        try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
                 byte[] buffer = (byte[]) objectInputStream.readObject();
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             } catch (FileNotFoundException ex) {
-            throw new RuntimeException(ex);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }catch (IOException e) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
@@ -124,16 +124,17 @@ public class VerifyEnvelope {
                 throw new RuntimeException(e);
             }
 //        서명 검증하기
-        try {
-            boolean rslt = signature_verify.verify(signatureBuffer);
-            System.out.println("서명 검증 결과: " + rslt);
-        } catch (SignatureException e) {
-            throw new RuntimeException(e);
-        }
-    } catch (FileNotFoundException e) {
+            try {
+                boolean rslt = signature_verify.verify(signatureBuffer);
+                System.out.println("서명 검증 결과: " + rslt);
+            } catch (SignatureException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
+}
