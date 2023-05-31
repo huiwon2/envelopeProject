@@ -54,7 +54,7 @@ public class VerifyEnvelope {
         }
         System.out.print("텍스트 입력(100byte 이하) : ");
         data = scanner.nextLine();
-        System.out.print("개인키 파일 입력 : ");
+        System.out.print("공개키 파일 입력 : ");
         publicName = scanner.next();
 
 //        bufferData => data의 byte타입으로 변환
@@ -70,5 +70,29 @@ public class VerifyEnvelope {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //        signature 생성하기
+        Signature signature;
+        byte[] sign;
+        try {
+            signature = Signature.getInstance(signAlgorithm);
+            signature.initSign(privateKey);
+            signature.update(bufferData);
+            sign = signature.sign();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+//      서명 정보 출력하기
+        System.out.println("입력된 서명 정보: " + sign.length);
+        for (byte b : sign) {
+            System.out.print(String.format("%02x", b) + "\t");
+        }
+        System.out.println();
+//        서명 검증하기
+
     }
+
 }
