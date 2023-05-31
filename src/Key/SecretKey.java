@@ -18,7 +18,7 @@ public class SecretKey {
         KeyGenerator keyGenerator;
 //        key 생성
         try {
-            keyGenerator = KeyGenerator.getInstance("AES");
+            keyGenerator = KeyGenerator.getInstance("DES");
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
