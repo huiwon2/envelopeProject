@@ -3,6 +3,9 @@ package Envelope;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.security.*;
 import java.util.Scanner;
 
@@ -49,6 +52,23 @@ public class VerifyEnvelope {
         } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
+        System.out.print("텍스트 입력(100byte 이하) : ");
+        data = scanner.nextLine();
+        System.out.print("개인키 파일 입력 : ");
+        publicName = scanner.next();
 
+//        bufferData => data의 byte타입으로 변환
+        byte[] bufferData = data.getBytes();
+
+//        공개키 읽어들이기
+        try(FileInputStream fileInputStream = new FileInputStream(publicName)){
+            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+                byte[] buffer = (byte[]) objectInputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
