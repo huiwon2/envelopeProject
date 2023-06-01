@@ -76,7 +76,7 @@ public class VerifyEnvelope {
         } catch (SignatureException e) {
             throw new RuntimeException(e);
         }
-        byte[] signatureBuffer;
+        byte[] signatureBuffer = new byte[1000];
 //        공개키 읽어들이기
         try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
@@ -99,16 +99,13 @@ public class VerifyEnvelope {
 //      서명 정보 출력하기(복호화 후 출력)
 //      복호화
         try (FileInputStream fis = new FileInputStream(envelopeName);
-             CipherInputStream cis = new CipherInputStream(fis, cipher);
-             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(cis))) {
-            StringBuffer decrypted = new StringBuffer();
-            String line = bufferedReader.readLine();
-            while (line != null){
-                decrypted.append(line);
-                line = bufferedReader.readLine();
+             CipherInputStream cis = new CipherInputStream(fis, cipher)) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = cis.read(buffer)) != -1) {
+                String decrypted = new String(buffer, 0, bytesRead);
+                System.out.print(decrypted);
             }
-            signatureBuffer = decrypted.toString().getBytes();
-            System.out.println(decrypted);
 
             // 검증을 위한 Signature 객체 생성
             try {
