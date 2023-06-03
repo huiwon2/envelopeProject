@@ -74,26 +74,25 @@ public class MakeEnvelope {
 //            throw new RuntimeException(e);
 //        }
 //        개인키 읽어들이기
-        try(FileInputStream fileInputStream = new FileInputStream(privateName)){
-            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+        try(FileInputStream fileInputStream = new FileInputStream(privateName);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
                 privateKey = (PrivateKey) objectInputStream.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 //        대칭키 읽어들이기
-        try(FileInputStream fileInputStream = new FileInputStream(secretName)){
-            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-                secretKey = (Key) objectInputStream.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+        try(FileInputStream fileInputStream = new FileInputStream(secretName);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            secretKey = (Key) objectInputStream.readObject();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 //        signature 생성하기
         Signature signature;
         byte[] sign;
