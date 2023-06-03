@@ -81,36 +81,28 @@ public class VerifyEnvelope {
         }
         byte[] signatureBuffer = new byte[1000];
 //        공개키 읽어들이기
-        try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-                publicKey = (PublicKey) objectInputStream.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+//        개인키 읽어들이기
+        try(FileInputStream fileInputStream = new FileInputStream(publicName);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            publicKey = (PublicKey) objectInputStream.readObject();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 //        대칭키 읽어들이기
-        try (FileInputStream fileInputStream = new FileInputStream(secretName)) {
-            try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-                secretKey = (Key) objectInputStream.readObject();
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+        try(FileInputStream fileInputStream = new FileInputStream(secretName);
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+            secretKey = (Key) objectInputStream.readObject();
         } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
         System.out.print("전자봉투 파일 입력 : ");
         envelopeName = scanner.next();
-
 
 //      서명 정보 출력하기(복호화 후 출력)
 //      복호화
