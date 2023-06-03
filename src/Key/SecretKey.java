@@ -6,6 +6,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.NoSuchPaddingException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -28,11 +29,13 @@ public class SecretKey {
         System.out.print("비밀키를 저장할 파일이름 : ");
         fname = sc.next();
 
-        try (FileOutputStream fos = new FileOutputStream(fname)) {
-            fos.write(secretKey.getEncoded());
-            fos.flush();
+        try (FileOutputStream fos = new FileOutputStream(fname);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(secretKey);
+            oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
     }
 }
