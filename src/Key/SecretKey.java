@@ -28,24 +28,10 @@ public class SecretKey {
         System.out.print("비밀키를 저장할 파일이름 : ");
         fname = sc.next();
 
-        Cipher c1;
-        try {
-            c1 = Cipher.getInstance("DES");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        }
-        try {
-            c1.init(Cipher.ENCRYPT_MODE, secretKey);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
-        try(FileOutputStream bos = new FileOutputStream(fname);
-            CipherOutputStream cos = new CipherOutputStream(bos, c1)){
-            cos.write(secretKey.getEncoded());
-            cos.flush();
-        }catch (IOException e){
+        try (FileOutputStream fos = new FileOutputStream(fname)) {
+            fos.write(secretKey.getEncoded());
+            fos.flush();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
