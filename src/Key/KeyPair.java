@@ -37,7 +37,7 @@ public class KeyPair {
 //        공개키
         try (FileOutputStream fileOutputStream = new FileOutputStream(public_name);
              ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-            objectOutputStream.writeObject(privateKey);
+            objectOutputStream.writeObject(publicKey);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

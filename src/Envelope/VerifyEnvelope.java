@@ -40,19 +40,8 @@ public class VerifyEnvelope {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        Key secretKey = keyGenerator.generateKey();
-//        cipher 객체
-        Cipher cipher;
-        try {
-            cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+        Key secretKey;
+
         System.out.print("텍스트 입력(100byte 이하) : ");
         data = scanner.nextLine();
         System.out.print("공개키 파일 입력 : ");
@@ -99,6 +88,19 @@ public class VerifyEnvelope {
             throw new RuntimeException(e);
         }
         catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+//        cipher 객체
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
         System.out.print("전자봉투 파일 입력 : ");
