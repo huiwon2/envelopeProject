@@ -37,5 +37,5 @@ public class SecretKey {
             e.printStackTrace();
         }
     }
-    }
 }
+
