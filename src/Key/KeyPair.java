@@ -35,20 +35,19 @@ public class KeyPair {
 
 
 //        공개키
-        try(FileOutputStream fileOutputStream = new FileOutputStream(public_name)){
-            try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)){
-                objectOutputStream.writeObject(publicKey.getEncoded());
-            }
-        }catch (IOException e){
-            e.printStackTrace();
+        try (FileOutputStream fileOutputStream = new FileOutputStream(public_name);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(privateKey);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 //        개인키
-        try(FileOutputStream fileOutputStream = new FileOutputStream(private_name)){
-            try(ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)){
-                objectOutputStream.writeObject(privateKey.getEncoded());
-            }
-        }catch (IOException e){
-            e.printStackTrace();
-        }    }
+        try (FileOutputStream fileOutputStream = new FileOutputStream(private_name);
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
+            objectOutputStream.writeObject(privateKey);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
