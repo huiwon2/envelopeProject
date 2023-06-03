@@ -38,19 +38,8 @@ public class MakeEnvelope {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
-        Key secretKey = keyGenerator.generateKey();
-//        cipher 객체
-        Cipher cipher;
-        try {
-            cipher = Cipher.getInstance("DES");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchPaddingException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        }
+        Key secretKey;
+
 
 
         System.out.print("텍스트 파일 입력(100byte 이하) : ");
@@ -91,6 +80,19 @@ public class MakeEnvelope {
             throw new RuntimeException(e);
         }
         catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+//        cipher 객체
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance("DES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchPaddingException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
             throw new RuntimeException(e);
         }
 //        signature 생성하기
