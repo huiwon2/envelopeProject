@@ -17,6 +17,7 @@ public class VerifyEnvelope {
         String data;
         String publicName;
         String envelopeName;
+        String secretName;
 
         KeyPairGenerator keyPairGen;
         KeyGenerator keyGenerator;
@@ -56,6 +57,8 @@ public class VerifyEnvelope {
         data = scanner.nextLine();
         System.out.print("공개키 파일 입력 : ");
         publicName = scanner.next();
+        System.out.print("대칭키 파일 입력 : ");
+        secretName = scanner.next();
 
 //        bufferData => data의 byte타입으로 변환
         byte[] bufferData = data.getBytes();
@@ -80,7 +83,7 @@ public class VerifyEnvelope {
 //        공개키 읽어들이기
         try (FileInputStream fileInputStream = new FileInputStream(publicName)) {
             try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-                byte[] buffer = (byte[]) objectInputStream.readObject();
+                publicKey = (PublicKey) objectInputStream.readObject();
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             } catch (FileNotFoundException ex) {
@@ -91,7 +94,20 @@ public class VerifyEnvelope {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
+//        대칭키 읽어들이기
+        try (FileInputStream fileInputStream = new FileInputStream(secretName)) {
+            try (ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
+                secretKey = (Key) objectInputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            } catch (FileNotFoundException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         System.out.print("전자봉투 파일 입력 : ");
         envelopeName = scanner.next();
 
@@ -103,8 +119,8 @@ public class VerifyEnvelope {
             byte[] buffer = new byte[1024];
             int bytesRead;
             while ((bytesRead = cis.read(buffer)) != -1) {
-                String decrypted = new String(buffer, 0, bytesRead);
-                System.out.print(decrypted);
+//                String decrypted = new String(buffer, 0, bytesRead);
+//                System.out.print(decrypted);
             }
 
             // 검증을 위한 Signature 객체 생성

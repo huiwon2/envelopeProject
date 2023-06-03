@@ -15,6 +15,7 @@ public class MakeEnvelope {
         String signAlgorithm = "SHA256withRSA";
         String data;
         String privateName;
+        String secretName;
 
         KeyPairGenerator keyPairGen;
         KeyGenerator keyGenerator;
@@ -56,6 +57,8 @@ public class MakeEnvelope {
         data = scanner.nextLine();
         System.out.print("개인키 파일 입력 : ");
         privateName = scanner.next();
+        System.out.print("대칭키 파일 입력 : ");
+        secretName = scanner.next();
 
 //        bufferData => data의 byte타입으로 변환
         byte[] bufferData = data.getBytes();
@@ -73,7 +76,17 @@ public class MakeEnvelope {
 //        개인키 읽어들이기
         try(FileInputStream fileInputStream = new FileInputStream(privateName)){
             try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-                byte[] buffer = (byte[]) objectInputStream.readObject();
+                privateKey = (PrivateKey) objectInputStream.readObject();
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+//        대칭키 읽어들이기
+        try(FileInputStream fileInputStream = new FileInputStream(secretName)){
+            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
+                secretKey = (Key) objectInputStream.readObject();
             } catch (ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
