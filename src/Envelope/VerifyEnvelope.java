@@ -29,7 +29,7 @@ public class VerifyEnvelope {
         keyPairGen.initialize(1024);
         KeyPair keyPair = keyPairGen.generateKeyPair();
 
-        PublicKey publicKey = keyPair.getPublic();
+        PublicKey publicKey;
         PrivateKey privateKey = keyPair.getPrivate();
 
 //        secretKey 객체 생성
@@ -49,28 +49,7 @@ public class VerifyEnvelope {
         System.out.print("대칭키 파일 입력 : ");
         secretName = scanner.next();
 
-//        bufferData => data의 byte타입으로 변환
-        byte[] bufferData = data.getBytes();
-
-//        signature 생성하기
-        Signature signature;
-        Signature signature_verify;// 검증 signature 객체
-        byte[] sign;
-        try {
-            signature = Signature.getInstance(signAlgorithm);
-            signature.initSign(privateKey);
-            signature.update(bufferData);
-            sign = signature.sign();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        } catch (InvalidKeyException e) {
-            throw new RuntimeException(e);
-        } catch (SignatureException e) {
-            throw new RuntimeException(e);
-        }
-        byte[] signatureBuffer = new byte[1000];
 //        공개키 읽어들이기
-//        개인키 읽어들이기
         try(FileInputStream fileInputStream = new FileInputStream(publicName);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
             publicKey = (PublicKey) objectInputStream.readObject();
@@ -91,6 +70,34 @@ public class VerifyEnvelope {
             throw new RuntimeException(e);
         }
 
+//        bufferData => data의 byte타입으로 변환
+        byte[] bufferData = data.getBytes();
+
+//        signature 생성하기
+        Signature signature;
+        Signature signature_verify;// 검증 signature 객체
+        byte[] sign;
+        try {
+            signature = Signature.getInstance(signAlgorithm);
+            signature.initSign(privateKey);
+            signature.update(bufferData);
+            sign = signature.sign();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        } catch (SignatureException e) {
+            throw new RuntimeException(e);
+        }
+//        signature 테스트 출력
+        System.out.println("입력된 서명 정보: " + sign.length);
+        for (byte b : sign) {
+            System.out.print(String.format("%02x", b) + "\t");
+        }
+        System.out.println();
+
+        byte[] signatureBuffer = new byte[128];
+
 //        cipher 객체
         Cipher cipher;
         try {
@@ -109,36 +116,52 @@ public class VerifyEnvelope {
 //      서명 정보 출력하기(복호화 후 출력)
 //      복호화
         try (FileInputStream fis = new FileInputStream(envelopeName);
-             CipherInputStream cis = new CipherInputStream(fis, cipher)) {
-            byte[] buffer = new byte[1024];
+             CipherInputStream cis = new CipherInputStream(fis, cipher);
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[128];
             int bytesRead;
             while ((bytesRead = cis.read(buffer)) != -1) {
 //                String decrypted = new String(buffer, 0, bytesRead);
 //                System.out.print(decrypted);
+                baos.write(buffer, 0, bytesRead);
             }
-
+            byte[] decryptedData = baos.toByteArray();
             // 검증을 위한 Signature 객체 생성
             try {
                 signature_verify = Signature.getInstance(signAlgorithm);
                 signature_verify.initVerify(publicKey);
-            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                signature_verify.update(bufferData);
+                System.out.println("입력 결과 : " + signature_verify.verify(sign));
+//                (중복코드)boolean isVerified = signature_verify.verify(signatureBuffer);
+                System.out.println("입력된 서명 정보: " + signature_verify);
+                for (byte b : signature_verify.sign()) {
+                    System.out.print(String.format("%02x", b) + "\t");
+                }
+            }catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            } catch (SignatureException e) {
                 throw new RuntimeException(e);
             }
 
             // 서명 검증
-            try {
-                signature_verify.update(signatureBuffer);
-                boolean isVerified = signature_verify.verify(signatureBuffer);
-            } catch (SignatureException e) {
-                throw new RuntimeException(e);
-            }
+//            불필요한 try절 나누기
+//            try {
+//                signature_verify.update(signatureBuffer);
+////                (중복코드)boolean isVerified = signature_verify.verify(signatureBuffer);
+//                System.out.println("입력된 서명 정보: " + signature_verify.sign().length);
+//                for (byte b : signature_verify.sign()) {
+//                    System.out.print(String.format("%02x", b) + "\t");
+//                }
+//            } catch (SignatureException e) {
+//                throw new RuntimeException(e);
+//            }
 //        서명 검증하기
-            try {
-                boolean rslt = signature_verify.verify(signatureBuffer);
-                System.out.println("서명 검증 결과: " + rslt);
-            } catch (SignatureException e) {
-                throw new RuntimeException(e);
-            }
+//            try {
+//                boolean result = signature_verify.verify(signatureBuffer);
+//                System.out.println("서명 검증 결과: " + result);
+//            } catch (SignatureException e) {
+//                throw new RuntimeException(e);
+//            }
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
