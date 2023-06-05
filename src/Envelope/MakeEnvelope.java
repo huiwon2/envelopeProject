@@ -51,17 +51,7 @@ public class MakeEnvelope {
 
 //        bufferData => data의 byte타입으로 변환
         byte[] bufferData = data.getBytes();
-//        data 읽어들이기(data를 문장으로 받아서)
-//        try(FileInputStream fileInputStream = new FileInputStream(data)){
-//            try(ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
-//                bufferData = (byte[]) objectInputStream.readObject();
-//                System.out.println();
-//            } catch (ClassNotFoundException e) {
-//                throw new RuntimeException(e);
-//            }
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+
 //        개인키 읽어들이기
         try(FileInputStream fileInputStream = new FileInputStream(privateName);
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)){
